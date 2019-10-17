@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.itis.jwtexample.models.DAOUser;
+import ru.itis.jwtexample.models.User;
 import ru.itis.jwtexample.repositories.UsersRepository;
 
 import java.util.ArrayList;
@@ -21,7 +21,8 @@ public class JwtUserDetailsService implements UserDetailsService {
 		if (!usersRepository.findByLogin(login).isPresent()) {
 			throw new UsernameNotFoundException("User not found with login: " + login);
 		}
-		DAOUser user = usersRepository.findByLogin(login).get();
+
+		User user = usersRepository.findByLogin(login).get();
 		return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(),
 				new ArrayList<>());
 	}

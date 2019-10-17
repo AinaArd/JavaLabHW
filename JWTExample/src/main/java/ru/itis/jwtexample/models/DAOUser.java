@@ -16,13 +16,13 @@ import javax.persistence.*;
 @Table(name = "user_dao")
 public class DAOUser {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	@Column
-	private String login;
-	@Column
-	@JsonIgnore
-	private String password;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    @Column
+    private String login;
+    @Column
+    @JsonIgnore
+    private String password;
 
 }

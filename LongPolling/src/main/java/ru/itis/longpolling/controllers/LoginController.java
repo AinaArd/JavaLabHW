@@ -21,8 +21,6 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
     @PreAuthorize("permitAll()")

@@ -13,5 +13,4 @@ import ru.itis.longpolling.models.User;
 @AllArgsConstructor
 public class MessageDto {
     private String text;
-    private String author;
 }

@@ -25,7 +25,6 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageDto> getAllMessagesDto() {
         return getAllMessages().stream().map(temp -> MessageDto.builder()
                 .text(temp.getText())
-                .author(temp.getAuthor().getLogin())
                 .build()).collect(Collectors.toList());
     }
 

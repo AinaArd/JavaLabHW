@@ -2,16 +2,16 @@ package ru.itis.jwtexample.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import ru.itis.jwtexample.forms.LoginForm;
 import ru.itis.jwtexample.forms.SignUpForm;
-import ru.itis.jwtexample.models.JwtRequest;
 import ru.itis.jwtexample.models.JwtResponse;
-import ru.itis.jwtexample.models.User;
 import ru.itis.jwtexample.security.details.JwtUserDetailsService;
 import ru.itis.jwtexample.services.UserService;
 import ru.itis.jwtexample.util.JwtTokenUtil;
@@ -32,12 +32,13 @@ public class JwtAuthenticationController {
 	@Autowired
     private UserService userService;
 
-	@PostMapping(value = "/authenticate")
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+	@PostMapping(value = "/login")
+	@PreAuthorize("permitAll()")
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginForm loginForm) throws Exception {
 
-		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+		authenticate(loginForm.getLogin(), loginForm.getPassword());
 
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+		final UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getLogin());
 
 		final String token = jwtTokenUtil.generateToken(userDetails);
 
@@ -45,9 +46,9 @@ public class JwtAuthenticationController {
 	}
 
 	@PostMapping(value = "/register")
+	@PreAuthorize("permitAll()")
 	public ResponseEntity<?> saveUser(@RequestBody SignUpForm signUpForm) throws Exception {
         userService.signUp(signUpForm);
-        System.out.println("user is registered successfully");
 		return ResponseEntity.ok().build();
 	}
 
