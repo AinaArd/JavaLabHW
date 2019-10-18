@@ -8,7 +8,6 @@ import java.util.List;
 
 @Builder
 @Data
-@ToString(exclude = "tokens")
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -20,12 +19,4 @@ public class User {
 
     private String login;
     private String passwordHash;
-
-    @Enumerated(value = EnumType.STRING)
-    private Role role;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Token> tokens;
-
 }
