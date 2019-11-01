@@ -6,7 +6,7 @@ import ru.itis.longpolling.models.Message;
 import java.util.List;
 
 public interface MessageService {
-    void addMessage(Message message);
+    void addMessage(MessageDto message, String token);
 
     List<MessageDto> getAllMessagesDto();
     List<Message> getAllMessages();

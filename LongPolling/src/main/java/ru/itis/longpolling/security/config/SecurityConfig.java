@@ -48,12 +48,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // отключаем csrf
         http.csrf().disable();
+        http.cors().disable();
         // отключаем сессии
         http.sessionManagement().disable();
         // добавляем наш фильтр
         http.addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
         // говорим, что разрешаем Swagger
-        http.authorizeRequests().antMatchers("/swagger-ui.html#/**").permitAll();
+            http.authorizeRequests().antMatchers("/swagger-ui.html#/**").permitAll();
         http.authorizeRequests().antMatchers("/messages").hasAuthority("USER");
 
     }

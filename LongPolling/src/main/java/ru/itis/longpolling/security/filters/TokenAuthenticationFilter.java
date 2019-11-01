@@ -8,13 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 public class TokenAuthenticationFilter implements Filter {
+    private final static String AUTH_HEADER = "AUTH";
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         // вытаскиваем запрос
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         // вытаскиваем заголовок с токеном
-        String token = request.getParameter("token");
+        String token = request.getHeader(AUTH_HEADER);
         // если заголовок содержит что-либо
         if (token != null) {
             // создаем объект токен-аутентификации

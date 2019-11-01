@@ -1,4 +1,4 @@
-package ru.itis.longpolling.dto;
+package ru.itis.longpolling.forms;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageDto {
+public class MessageForm {
     private String text;
-    private String token;
-    private String author;
 }
+

@@ -1,52 +1,74 @@
 package ru.itis.longpolling.controllers;
 
-import lombok.SneakyThrows;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import ru.itis.longpolling.models.User;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.itis.longpolling.dto.MessageDto;
-import ru.itis.longpolling.models.Message;
+import ru.itis.longpolling.models.Token;
+import ru.itis.longpolling.repositories.TokensRepository;
 import ru.itis.longpolling.services.MessageService;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class MessagesController {
+    private final Map<String, List<MessageDto>> messages = new HashMap<>();
 
     @Autowired
     private MessageService messageService;
 
-    @PostMapping(value = "/messages")
-    public ResponseEntity<Object> receiveMessage(@RequestBody MessageDto messageDto) {
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Message message = Message.builder()
-                .text(messageDto.getText())
-                .author(currentUser)
-                .build();
-        messageService.addMessage(message);
-//        for (Message singleMessage : messageService.getAllMessages()) {
-//            synchronized (messageService.getAllMessagesDto()) {
-//                messageService.addMessage(singleMessage);
-//                messageService.getAllMessagesDto().notifyAll();
-//            }
-//        }
+    @Autowired
+    private TokensRepository tokensRepository;
 
-        return ResponseEntity.ok(getMessages());
+    @CrossOrigin
+    @ApiOperation("Get message")
+    @GetMapping("/messages")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<MessageDto>> getMessagesForPage(@RequestHeader("AUTH") String token) throws InterruptedException {
+        synchronized (messages.get(token)) {
+            if (messages.get(token).isEmpty()) {
+                messages.get(token).wait();
+            }
+            List<MessageDto> response = new ArrayList<>(messages.get(token));
+            messages.get(token).clear();
+            return ResponseEntity.ok(response);
+        }
     }
 
-    @SneakyThrows
-    @GetMapping(value = "/messages")
-    public ResponseEntity<List<MessageDto>> getMessages() {
-//        synchronized (messageService.getAllMessagesDto()) {
-//            if (messageService.getAllMessagesDto().isEmpty()) {
-//                messageService.getAllMessagesDto().wait();
-//            }
-//           again take from db
-//            List<MessageDto> response = messageService.getAllMessagesDto();
-//            return ResponseEntity.ok().body(response);
-        List<MessageDto> messages = messageService.getAllMessagesDto();
-        return ResponseEntity.ok().body(messages);
+    @CrossOrigin
+    @ApiOperation("Add new message")
+    @PostMapping("/messages")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Object> receiveMessage(@RequestBody MessageDto messageForm, @RequestHeader("AUTH") String token) {
+        if (!messages.containsKey(token)) {
+            messages.put(token, new ArrayList<>());
+        }
+        for (List<MessageDto> pageMessages : messages.values()) {
+            synchronized (pageMessages) {
+                Token tokenCandidate = tokensRepository.findByValue(token).orElseThrow(IllegalArgumentException::new);
+                MessageDto messageDto = MessageDto.builder()
+                        .text(messageForm.getText())
+                        .author(tokenCandidate.getUser().getLogin())
+                        .token(token)
+                        .build();
+                if (messageForm.getText() != null) {
+                    messageService.addMessage(messageDto, token);
+                    pageMessages.add(messageDto);
+                    pageMessages.notifyAll();
+                }
+            }
+        }
+        return ResponseEntity.ok().build();
     }
+
+    @CrossOrigin
+    @PreAuthorize("permitAll()")
+    @GetMapping("/getAll")
+    public ResponseEntity<List<MessageDto>> getAllMessages() {
+        System.out.println(messageService.getAllMessagesDto());
+        return ResponseEntity.ok(messageService.getAllMessagesDto());
+    }
+
 }

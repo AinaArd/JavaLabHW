@@ -28,29 +28,14 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        // делаем явное преобразование для работы с TokenAuthentication
         TokenAuthentication tokenAuthentication
                 = (TokenAuthentication) authentication;
         Optional<Token> tokenCandidate = tokensRepository.findByValue(authentication.getName());
         if(tokenCandidate.isPresent()) {
             UserDetailsImpl userDetails = (UserDetailsImpl) service.loadUserByUsername(tokenAuthentication.getName());
             tokenAuthentication.setUserDetails(userDetails);
-            // говорим, что с ним все окей
             tokenAuthentication.setAuthenticated(true);
         }
-//        // загружаем данные безопасности пользователя из UserDetailsService
-//        // по токену достали пользователя из БД
-//        UserDetailsImpl userDetails = (UserDetailsImpl) service.loadUserByUsername(tokenAuthentication.getName());
-//        // если данные пришли
-//        if (userDetails != null && userDetails.getCurrentToken().isNotExpired()) {
-//            // в данный объект аутентификации кладем пользователя
-//            tokenAuthentication.setUserDetails(userDetails);
-//            // говорим, что с ним все окей
-//            tokenAuthentication.setAuthenticated(true);
-//        } else {
-//            throw new BadCredentialsException("Incorrect Token");
-//        }
-        // возвращаем объект SecurityContext-у
         return tokenAuthentication;
     }
 
