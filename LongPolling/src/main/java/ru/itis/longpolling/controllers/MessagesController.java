@@ -42,24 +42,25 @@ public class MessagesController {
     @PostMapping("/messages")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Object> receiveMessage(@RequestBody MessageDto messageForm, @RequestHeader("AUTH") String token) {
+        MessageDto messageDto = null;
         if (!messages.containsKey(token)) {
             messages.put(token, new ArrayList<>());
         }
         for (List<MessageDto> pageMessages : messages.values()) {
             synchronized (pageMessages) {
                 Token tokenCandidate = tokensRepository.findByValue(token).orElseThrow(IllegalArgumentException::new);
-                MessageDto messageDto = MessageDto.builder()
+                messageDto = MessageDto.builder()
                         .text(messageForm.getText())
                         .author(tokenCandidate.getUser().getLogin())
                         .token(token)
                         .build();
                 if (messageForm.getText() != null) {
-                    messageService.addMessage(messageDto, token);
                     pageMessages.add(messageDto);
                     pageMessages.notifyAll();
                 }
             }
         }
+        messageService.addMessage(messageDto, token);
         return ResponseEntity.ok().build();
     }
 
