@@ -1,11 +1,14 @@
 package ru.itis.jwtexample.models;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.Collection;
-
 
 @Builder
 @Data
@@ -20,6 +23,7 @@ public class User {
 
     private String login;
     private String password;
+    private Role role;
 
     @Transient
     private Collection<GrantedAuthority> authorities;

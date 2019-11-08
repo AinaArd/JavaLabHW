@@ -1,6 +1,7 @@
 package ru.itis.jwtexample.security.details;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +24,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 		}
 
 		User user = usersRepository.findByLogin(login).get();
-		return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(),
-				new ArrayList<>());
+		return new UserDetailsImpl(user);
 	}
 }

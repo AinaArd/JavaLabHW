@@ -12,9 +12,5 @@ import lombok.NoArgsConstructor;
 public class MessageDto {
     private String text;
     private String author;
-
-    public void clear() {
-        setText(null);
-        setAuthor(null);
-    }
+    private String token;
 }

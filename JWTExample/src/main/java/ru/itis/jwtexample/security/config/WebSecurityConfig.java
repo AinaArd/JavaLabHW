@@ -1,7 +1,6 @@
 package ru.itis.jwtexample.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,11 +11,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.itis.jwtexample.security.details.JwtUserDetailsService;
-import ru.itis.jwtexample.security.filter.JwtRequestFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ru.itis.jwtexample.security.filter.JwtAuthenticationFilter;
+import ru.itis.jwtexample.security.provider.JwtAuthenticationProvider;
+
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +36,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    private JwtAuthenticationFilter filter;
+
+    @Autowired
+    private JwtAuthenticationProvider provider;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -53,15 +59,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // We don't need CSRF for this example
         httpSecurity.csrf().disable()
+                .cors().disable()
                 // dont authenticate this particular request
                 .authorizeRequests().antMatchers("/swagger-ui.html#/**").permitAll()
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
-        .and()
-        .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // set custom auth provider
+                .and()
+                .authenticationProvider(provider);
 
         // Add a filter to validate the tokens with every request
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 }
