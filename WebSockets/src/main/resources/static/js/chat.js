@@ -18,17 +18,17 @@ function connect(event) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
         var socket = new SockJS('/messages');
+        console.log(socket.toString());
         stompClient = Stomp.over(socket);
+        console.log(stompClient.id);
         stompClient.connect({}, onConnected, onError);
     }
-        event.preventDefault();
+    event.preventDefault();
 }
 function onConnected() {
     // Subscribe to the Public Topic
-    console.log('connecting');
     stompClient.subscribe('/topic/public', onMessageReceived);
     // Tell your username to the server
-    console.log('connected');
     stompClient.send("/app/chat.addUser",
         {},
         JSON.stringify({sender: username, type: 'JOIN'})
@@ -39,24 +39,31 @@ function onError(error) {
     connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
     connectingElement.style.color = 'red';
 }
+
 function sendMessage(event) {
     var messageContent = messageInput.value.trim();
-
-    if(messageContent && stompClient) {
-        var chatMessage = {
-            sender: username,
-            content: messageInput.value,
-            type: 'CHAT'
-        };
+    // var token = window.localStorage.getItem("AUTH");
+    if (messageContent && stompClient) {
+        // stompClient.send("/app/chat.sendMessage", {"AUTH": token}, JSON.stringify(chatMessage));
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+        stompClient.send({
+            url: '/app/chat.sendMessage',
+            data: {
+                'content': chatMessage
+            },
+            // headers: {
+            //     "AUTH": window.localStorage.getItem("AUTH")
+            // }
+        });
         messageInput.value = '';
     }
     event.preventDefault();
 }
+
 function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
-    if(message.type === 'JOIN') {
+    if (message.type === 'JOIN') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' joined!';
     } else if (message.type === 'LEAVE') {
@@ -82,6 +89,7 @@ function onMessageReceived(payload) {
     messageArea.appendChild(messageElement);
     messageArea.scrollTop = messageArea.scrollHeight;
 }
+
 function getAvatarColor(messageSender) {
     var hash = 0;
     for (var i = 0; i < messageSender.length; i++) {
@@ -90,5 +98,10 @@ function getAvatarColor(messageSender) {
     var index = Math.abs(hash % colors.length);
     return colors[index];
 }
+
+function disconnect() {
+    stompClient.disconnect();
+}
+
 usernameForm.addEventListener('submit', connect, true);
 messageForm.addEventListener('submit', sendMessage, true);

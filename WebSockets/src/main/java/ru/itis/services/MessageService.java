@@ -20,7 +20,7 @@ public class MessageService {
     private UserService userService;
 
     public MessageDto addMessage(MessageDto messageDto) {
-        User sender = userService.getUserByName(messageDto.getSender());
+        User sender = userService.getUserByName(messageDto.getSender()).get();
         Message message = Message.builder()
                 .content(messageDto.getContent())
                 .sender(sender)

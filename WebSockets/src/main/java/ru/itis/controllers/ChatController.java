@@ -10,13 +10,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.itis.dto.MessageDto;
 import ru.itis.services.MessageService;
-
+import ru.itis.services.UserService;
 
 @Controller
 public class ChatController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private UserService userService;
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
@@ -27,8 +30,14 @@ public class ChatController {
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
     public MessageDto addUser(@Payload MessageDto messageDto,
-                           SimpMessageHeaderAccessor headerAccessor) {
-        headerAccessor.getSessionAttributes().put("username", messageDto.getSender());
+                              SimpMessageHeaderAccessor headerAccessor) {
+//        add login validation
+        if (userService.login(messageDto.getSender())) {
+            headerAccessor.getSessionAttributes().put("username", messageDto.getSender());
+
+        } else {
+            headerAccessor.getSessionAttributes().put("username", null);
+        }
         return messageDto;
     }
 
@@ -37,16 +46,5 @@ public class ChatController {
         return "chat";
     }
 
-//    @GetMapping("/chat/{desk-id}")
-//    public String getChatPage(Authentication authentication, ModelMap model, @PathVariable(name = "desk-id") Long deskId) {
-//        Desk desk = deskService.findOneDesk(deskId).orElseThrow(IllegalArgumentException::new);
-//        User currentUser = ((UserDetailsImpl) authentication.getPrincipal()).getUser();
-//        List<Message> messages = messageService.getDeskMessages(desk);
-//
-//        model.addAttribute("messages", messages);
-//        model.addAttribute("currentUser", currentUser);
-//        model.addAttribute("desk", desk);
-//        return "chat";
-//    }
 }
 
