@@ -5,9 +5,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.itis.dto.MessageDto;
 import ru.itis.dto.TokenDto;
 import ru.itis.forms.LoginForm;
-import ru.itis.forms.SignUpForm;
+import ru.itis.forms.UserForm;
+import ru.itis.models.Message;
 import ru.itis.models.User;
 import ru.itis.repositories.UserRepository;
 
@@ -38,34 +40,41 @@ public class UserService {
                 .compact();
     }
 
-    public TokenDto login(LoginForm loginForm) {
-        Optional<User> userCandidate = getUserByName(loginForm.getLogin());
+//    public TokenDto login(LoginForm loginForm) {
+//        Optional<User> userCandidate = getUserByName(loginForm.getLogin());
+//
+//        if (userCandidate.isPresent()) {
+//            User user = userCandidate.get();
+//            return from(createToken(user));
+//        }
+//        throw new IllegalArgumentException("Can not find such user");
+//    }
 
-        if (userCandidate.isPresent()) {
-            User user = userCandidate.get();
-            return from(createToken(user));
-        }
-        throw new IllegalArgumentException("Can not find such user");
-    }
-
-    private Optional<User> getUserByName(String userName) {
+    public Optional<User> getUserByName(String userName) {
         if (userRepository.findByLogin(userName).isPresent()) {
             return userRepository.findByLogin(userName);
-        } else {
-            throw new IllegalArgumentException("Can not find such user");
         }
+        return Optional.empty();
     }
 
-    public boolean login(String sender) {
-        return getUserByName(sender).isPresent();
+    public boolean login(MessageDto messageDto) {
+        Optional<User> userCandidate = getUserByName(messageDto.getSender());
+        if(userCandidate.isPresent()) {
+            return userCandidate.filter(user -> checkPassword(messageDto.getPassword(), user)).isPresent();
+        }
+        return false;
     }
 
-//    public User signUp(SignUpForm signUpForm) {
+    private boolean checkPassword(String password, User userCandidate) {
+        return userCandidate.getPassword().equals(password);
+    }
+
+    public User signUp(MessageDto messageDto) {
 //        String hashPassword = passwordEncoder.encode(signUpForm.getPassword());
-//        User newUser = User.builder()
-//                .login(signUpForm.getLogin())
-//                .password(hashPassword)
-//                .build();
-//        return userRepository.save(newUser);
-//    }
+        User newUser = User.builder()
+                .login(messageDto.getSender())
+                .password(messageDto.getPassword())
+                .build();
+        return userRepository.save(newUser);
+    }
 }

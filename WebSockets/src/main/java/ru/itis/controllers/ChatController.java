@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.itis.dto.MessageDto;
+import ru.itis.forms.UserForm;
+import ru.itis.models.User;
 import ru.itis.services.MessageService;
 import ru.itis.services.UserService;
 
@@ -32,11 +34,12 @@ public class ChatController {
     public MessageDto addUser(@Payload MessageDto messageDto,
                               SimpMessageHeaderAccessor headerAccessor) {
 //        add login validation
-        if (userService.login(messageDto.getSender())) {
+        if (userService.login(messageDto)) {
             headerAccessor.getSessionAttributes().put("username", messageDto.getSender());
 
         } else {
-            headerAccessor.getSessionAttributes().put("username", null);
+            User newUser = userService.signUp(messageDto);
+            headerAccessor.getSessionAttributes().put("username", newUser.getLogin());
         }
         return messageDto;
     }

@@ -10,10 +10,12 @@
 </noscript>
 <div id="username-page">
     <div class="username-page-container">
-        <h1 class="title">Type your username</h1>
+        <h1 class="title">Type your username and password</h1>
         <form id="usernameForm" name="usernameForm">
             <div class="form-group">
                 <input type="text" id="name" name="sender" placeholder="Username" autocomplete="off" class="form-control"/>
+                <br>
+                <input type="password" id="password" name="sender_password" placeholder="Password" autocomplete="off" class="form-control"/>
             </div>
             <div class="form-group">
                 <button type="submit" class="accent username-submit">Start Chatting</button>

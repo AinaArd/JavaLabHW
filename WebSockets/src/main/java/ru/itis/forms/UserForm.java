@@ -3,7 +3,7 @@ package ru.itis.forms;
 import lombok.Data;
 
 @Data
-public class SignUpForm {
-    private String login;
+public class UserForm {
+    private String name;
     private String password;
 }

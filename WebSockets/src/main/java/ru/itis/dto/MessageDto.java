@@ -11,6 +11,7 @@ public class MessageDto {
     private String sender;
     private String content;
     private String type;
+    private String password;
 
     public static MessageDto from(Message message) {
         return MessageDto.builder()
