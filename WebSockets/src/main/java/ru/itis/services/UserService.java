@@ -4,7 +4,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.itis.dto.TokenDto;
 import ru.itis.forms.LoginForm;
@@ -22,17 +21,16 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-
     @Value("${token.expired}")
     private Integer expiredSecondsForToken;
 
     @Value("${jwt.secret}")
     private String key;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
-    public String createToken(User user) {
+    private String createToken(User user) {
         return Jwts.builder()
                 .claim("login", user.getLogin())
                 .claim("id", user.getId())
@@ -50,7 +48,7 @@ public class UserService {
         throw new IllegalArgumentException("Can not find such user");
     }
 
-    public Optional<User> getUserByName(String userName) {
+    private Optional<User> getUserByName(String userName) {
         if (userRepository.findByLogin(userName).isPresent()) {
             return userRepository.findByLogin(userName);
         } else {
@@ -59,15 +57,15 @@ public class UserService {
     }
 
     public boolean login(String sender) {
-        return getUserByName(sender) != null;
+        return getUserByName(sender).isPresent();
     }
 
-    public User signUp(SignUpForm signUpForm) {
-        String hashPassword = passwordEncoder.encode(signUpForm.getPassword());
-        User newUser = User.builder()
-                .login(signUpForm.getLogin())
-                .password(hashPassword)
-                .build();
-        return userRepository.save(newUser);
-    }
+//    public User signUp(SignUpForm signUpForm) {
+//        String hashPassword = passwordEncoder.encode(signUpForm.getPassword());
+//        User newUser = User.builder()
+//                .login(signUpForm.getLogin())
+//                .password(hashPassword)
+//                .build();
+//        return userRepository.save(newUser);
+//    }
 }

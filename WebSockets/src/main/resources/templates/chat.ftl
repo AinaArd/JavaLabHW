@@ -35,6 +35,8 @@
                 </#list>
             </#if>
         </ul>
+        <br>
+        <br>
         <form id="messageForm" name="messageForm">
             <div class="form-group">
                 <div class="input-group clearfix">
