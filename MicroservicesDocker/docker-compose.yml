@@ -1,0 +1,29 @@
+version: '3'
+services:
+
+  eureka_service:
+    build: 
+      context: .
+      dockerfile: EurekaService/Dockerfile
+    command: bash -c "mvn spring-boot:run"
+    ports:
+      - "9000:9000"
+
+  zuul_service:
+    build: 
+      context: .
+      dockerfile: ZuulService/Dockerfile
+    command: bash -c "mvn spring-boot:run"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka_service
+
+  cat_service:
+    build: 
+      context: .
+      dockerfile: CatsService/Dockerfile
+    command: bash -c "mvn spring-boot:run"
+    depends_on:
+      - eureka_service
+      - zuul_service
