@@ -1,0 +1,36 @@
+version: '3.3'
+services:
+
+  eureka-service:
+    build: 
+      context: EurekaService
+      dockerfile: Dockerfile
+    ports:
+      - 9000:9000
+    networks:
+      - cloud
+
+
+  zuul-service:
+    build:
+      context: ZuulService
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - cloud
+
+
+  cat-service:
+    build:
+      context: CatsService
+      dockerfile: Dockerfile
+#    depends_on:
+#      - eureka_service
+#      - zuul_service
+    networks:
+      - cloud
+
+networks:
+  cloud:
+    external: false

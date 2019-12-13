@@ -4,10 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.itis</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>zuul</artifactId>
     <version>0.1</version>
-    <name>demo</name>
-    <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -17,20 +15,16 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
 
     <parent>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-parent</artifactId>
-        <version>Camden.SR7</version>
+        <groupId>ru.itis</groupId>
+        <artifactId>docker</artifactId>
+        <version>0.1</version>
     </parent>
 
     <dependencies>
