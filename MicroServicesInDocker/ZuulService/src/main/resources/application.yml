@@ -5,6 +5,14 @@ zuul:
       path: /cat/**
       serviceId: CAT
 
+    country:
+      path: /country/**
+      serviceId: COUNTRY
+
+    about:
+      path: /about/**
+      servcieId: ABOUT
+
 
 ribbon:
   ConnectTimeout: 10000

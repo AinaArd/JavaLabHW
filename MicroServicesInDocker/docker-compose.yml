@@ -20,14 +20,24 @@ services:
     networks:
       - cloud
 
-
   cat-service:
     build:
       context: CatsService
       dockerfile: Dockerfile
-#    depends_on:
-#      - eureka_service
-#      - zuul_service
+    networks:
+      - cloud
+
+  user-service:
+    build:
+      context: UsersInfoService
+      dockerfile: Dockerfile
+    networks:
+      - cloud
+
+  country-service:
+    build:
+      context: CountriesService
+      dockerfile: Dockerfile
     networks:
       - cloud
 

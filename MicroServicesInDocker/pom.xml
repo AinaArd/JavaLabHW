@@ -19,5 +19,7 @@
         <module>CatsService</module>
         <module>EurekaService</module>
         <module>ZuulService</module>
+        <module>UsersInfoService</module>
+        <module>CountriesService</module>
     </modules>
 </project>
