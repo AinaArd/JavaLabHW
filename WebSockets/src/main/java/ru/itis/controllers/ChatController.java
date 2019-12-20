@@ -58,7 +58,8 @@ public class ChatController {
         if (userService.login(messageDto)) {
             headerAccessor.getSessionAttributes().put("username", messageDto.getSender());
         } else {
-            headerAccessor.getSessionAttributes().put("username", messageDto.getSender());
+            User newUser = userService.signUp(messageDto.getSender(), messageDto.getPassword());
+            headerAccessor.getSessionAttributes().put("username", newUser.getLogin());
         }
         messageDto.setType(MessageType.JOIN.toString());
         messagingTemplate.convertAndSend(format("/topic/%s", chatId), messageDto);

@@ -3,7 +3,6 @@ package ru.itis.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.itis.models.Message;
-import ru.itis.models.MessageType;
 
 @Builder
 @Data

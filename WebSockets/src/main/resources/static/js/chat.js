@@ -31,12 +31,11 @@ function connect(event) {
 function enterRoom(newChatId) {
     chatId = newChatId;
     topic = `/app/chat/${newChatId}`;
-
     stompClient.subscribe(`/topic/${chatId}`, onMessageReceived);
 
     stompClient.send(`${topic}/addUser`,
         {},
-        JSON.stringify({sender: username, type: 'JOIN'})
+        JSON.stringify({sender: username, type: 'JOIN', password: password})
     );
 }
 
@@ -52,7 +51,7 @@ function onError(error) {
 
 function sendMessage(event) {
     chatId = chatInput.value;
-    topic = '/app/chat/' + chatId;
+    topic = `/app/chat/${chatId}`;
     var messageContent = messageInput.value.trim();
     var chatMessage = {
         chatId: chatInput.value,
@@ -60,8 +59,7 @@ function sendMessage(event) {
         content: messageInput.value,
         type: 'CHAT'
     };
-    console.log(chatMessage.chatId);
-    stompClient.send(topic + '/sendMessage', {}, JSON.stringify(chatMessage));
+    stompClient.send(`${topic}/sendMessage`, {}, JSON.stringify(chatMessage));
     messageInput.value = '';
     event.preventDefault();
 }

@@ -6,16 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.itis.dto.MessageDto;
-import ru.itis.dto.TokenDto;
-import ru.itis.forms.LoginForm;
-import ru.itis.forms.UserForm;
-import ru.itis.models.Message;
 import ru.itis.models.User;
 import ru.itis.repositories.UserRepository;
 
 import java.util.Optional;
-
-import static ru.itis.dto.TokenDto.from;
 
 @Service
 public class UserService {
@@ -69,11 +63,10 @@ public class UserService {
         return userCandidate.getPassword().equals(password);
     }
 
-    public User signUp(MessageDto messageDto) {
-//        String hashPassword = passwordEncoder.encode(signUpForm.getPassword());
+    public User signUp(String login, String password) {
         User newUser = User.builder()
-                .login(messageDto.getSender())
-                .password(messageDto.getPassword())
+                .login(login)
+                .password(password)
                 .build();
         return userRepository.save(newUser);
     }
