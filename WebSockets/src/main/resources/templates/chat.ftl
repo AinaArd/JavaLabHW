@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/css/chat.css" />
 </head>
 <body>
+<input id="chatId" hidden value="${chatId}">
 <noscript>
     <h2>Sorry! Your browser doesn't support Javascript</h2>
 </noscript>
@@ -32,7 +33,7 @@
             <#if messages??>
                 <#list messages as message>
                     <div>
-                        ${message.sender}: ${message.content}
+                        ${message.sender.login}: ${message.content}
                     </div>
                 </#list>
             </#if>
